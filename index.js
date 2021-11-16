@@ -24,9 +24,16 @@ async function run(){
     const OrderCollection = database.collection("Order");
     const ServicesCollection = database.collection("Services");
     const userCollection=database.collection('users')
-// GET API
-app.get('/orders',async(req,res)=>{
+    const reviewCollection=database.collection('reviews')
+// GET service 
+app.get('/services',async(req,res)=>{
+    const cursor=ServicesCollection.find({})
+    const orders=await cursor.toArray()
+    res.send(orders)
+})
 
+// GET order
+app.get('/orders',async(req,res)=>{
     const email = req.query.email;
     let query={}
     if (email) {
@@ -36,9 +43,15 @@ app.get('/orders',async(req,res)=>{
     const orders=await cursor.toArray()
     res.send(orders)
 })
+// GET review data 
+app.get('/review',async(req,res)=>{
+    const cursor=reviewCollection.find({})
+    const review=await cursor.toArray()
+    res.send(review)
+})
+
 // POST order booking
 app.post('/order',async (req,res)=>{
-
     const order=req.body
     const result= await OrderCollection.insertOne(order)    
     res.json(result)
@@ -47,10 +60,22 @@ app.post('/order',async (req,res)=>{
 //post user data
 app.post('/users',async(req,res)=>{
     const user=req.body
-    console.log(user);
     const result=await userCollection.insertOne(user)
     res.json(result)
-    console.log(result);
+})
+
+//post review data
+app.post('/review',async(req,res)=>{
+    const user=req.body
+    const result=await reviewCollection.insertOne(user)
+    res.json(result)
+})
+//post service add  data
+app.post('/services',async(req,res)=>{
+    const service=req.body
+    console.log(service);
+    const result=await ServicesCollection.insertOne(service)
+    res.json(result)
 })
 
 // user googleLogin upsert or update user details
@@ -86,7 +111,22 @@ app.get('/users/:email',async(req,res)=>{
   res.send({admin:isAdmin})
 })
 
-
+      // DELETE  service with id
+      app.delete('/services/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const result = await ServicesCollection.deleteOne(query);
+        res.json(result);
+    })
+    
+    
+    // DELETE an order with id
+      app.delete('/orders/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const result = await OrderCollection.deleteOne(query);
+        res.json(result);
+    })
 
 
 
